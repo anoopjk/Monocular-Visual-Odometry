@@ -1,0 +1,2 @@
+/usr/bin/ar cr libfive-point-nister.a  CMakeFiles/five-point-nister.dir/five-point.cpp.o CMakeFiles/five-point-nister.dir/precomp.cpp.o CMakeFiles/five-point-nister.dir/modelest.cpp.o
+/usr/bin/ranlib libfive-point-nister.a
