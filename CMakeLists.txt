@@ -10,13 +10,8 @@ include_directories(
 add_subdirectory(five-point-nister)
 
 file(GLOB viso
-    #"src/MVO.h"
-    #"src/MVO.cpp"
-    "src/features.h"
+    "src/featurematch.h"
     "src/main.cpp"
-    #"adhoctracker/util.cpp"
-    #"adhoctracker/util.h"
-    #"fast-cpp-csv-parser/csv.h"
 )
 add_executable( mvo ${viso} )
 set_target_properties(mvo PROPERTIES COMPILE_FLAGS "-std=c++11 -w -g -O3") 
