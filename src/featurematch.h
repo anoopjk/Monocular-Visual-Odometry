@@ -394,14 +394,19 @@ void relativeTransformation(Mat &E, Mat &R, Mat &t, Mat &K, vector<Point2f> &pre
 }
 
 //Note Prev => Train, Curr => Query
-void featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat &tvec)
+int featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat &tvec)
 {
+  int features_count = 0;
   //cout << "entered featureMatching" << endl;
   cv::Mat imGray;
-  if(img.channels() == 3)
-      cvtColor(img, imGray, CV_RGB2GRAY);
-  else
-      img.copyTo(imGray);
+  if(img.channels() == 3){
+     cvtColor(img, imGray, CV_RGB2GRAY);
+  }
+     
+  else{
+     img.copyTo(imGray);
+  }
+     
 
     // SIFT...
   img.copyTo(SIFT_outputImg);
@@ -432,8 +437,9 @@ void featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat 
 
   //cout << "detect and compute done " << endl;
 
-  if(SIFT_H_prev.empty())
+  if(SIFT_H_prev.empty()){
     SIFT_H_prev = Mat::eye(3,3,CV_32FC1);
+  }
 
 
   if(!SIFT_train_kpts.empty())
@@ -471,8 +477,10 @@ void featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat 
   
         //cout << "temporal matches count: " << countNonZero(Mat(SIFT_match_mask)) << endl;
       }
-      else
+      else{
+
         SIFT_H_prev = Mat::eye(3,3,CV_32FC1);
+      }
 
       //cout << "before drawMatchesRelative" << endl;
 
@@ -481,7 +489,7 @@ void featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat 
       E = findEssentialMat(currFeatures, prevFeatures, K.at<double>(0,0), Point2d(K.at<double>(0,2),K.at<double>(1,2)) , RANSAC, 0.999, 1.0, mask);
       //cout << "masksize: " << mask.size() << "countNonZero: " << countNonZero(mask) << endl;
       Mat pt_3d;
-      recoverPose(E, currFeatures, prevFeatures, R, t, pt_3d, K.at<double>(0,0), Point2d(K.at<double>(0,2),K.at<double>(1,2)), mask);
+      features_count = recoverPose(E, currFeatures, prevFeatures, R, t, pt_3d, K.at<double>(0,0), Point2d(K.at<double>(0,2),K.at<double>(1,2)), mask);
       //pt_3d = pt_3d.t();
       //cout << "pt_3d.channels: " <<  pt_3d.channels() << endl;
       //Mat rvec; // tvec;
@@ -521,6 +529,11 @@ void featureMatching(Mat &img, Mat &SIFT_outputImg, Mat &K, Mat &R, Mat &t, Mat 
   //cout << "prev items copied" << endl;
   
   if(true)
+  {
     cout << ", SIFT matches: " << SIFT_matches.size();
+  }
+
+  return features_count;
 
 }
+

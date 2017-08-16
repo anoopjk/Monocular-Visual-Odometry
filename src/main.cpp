@@ -72,14 +72,14 @@ int main( int argc, char** argv )
 
   double scale = 1.00;
 
-  String folderpath = "/home/anoop/Documents/robotics/EKF_mono_slam/KITTI02/image_2/*.png";
+  String folderpath = "/home/anoop/Documents/yembo/processedIMG/*.png" ; //"/home/anoop/Documents/robotics/EKF_mono_slam/KITTI02/image_2/*.png";
   vector<String> filenames;
   cv::glob(folderpath, filenames);
 
 
   Mat K(3, 3, CV_64F);
-  K.at<double>(0,0) = 7.188560000000e+02 ;  K.at<double>(0,1) = 0.; K.at<double>(0,2) = 6.071928000000e+02 ;
-  K.at<double>(1,0) = 0.; K.at<double>(1,1) = 7.188560000000e+02; K.at<double>(1,2) = 1.852157000000e+02 ;
+  K.at<double>(0,0) = 1075.62   /*7.188560000000e+02*/ ;  K.at<double>(0,1) = 0.; K.at<double>(0,2) = 621.462 /*6.071928000000e+02 */;
+  K.at<double>(1,0) = 0.; K.at<double>(1,1) = 1075.62  /*7.188560000000e+02*/ ; K.at<double>(1,2) = 358.773 /*1.852157000000e+02 */;
   K.at<double>(2,0) = 0.; K.at<double>(2,1) = 0.; K.at<double>(2,2) = 1.;
 
   Mat D(5, 1, CV_64F);
@@ -92,9 +92,10 @@ int main( int argc, char** argv )
   Mat R_f = Mat::eye(3,3,CV_64F);
   Mat t_f = Mat::zeros(3,1,CV_64F);
   Mat R, t,tvec, E, mask;
-
+  int features_count = 0;
 
   cout << "before while loop" << endl;
+  cout << "no.of images: " << filenames.size() << endl;
     while( true /*framenum <=3000*/)
     {
         cout << "Image#: " <<  framenum << endl;
@@ -102,13 +103,14 @@ int main( int argc, char** argv )
 
             
             currImage = imread(filenames[framenum]);
-            featureMatching(currImage, prevImage, K, R, t, tvec);
+            cout << filenames[framenum] << endl;
+            features_count = featureMatching(currImage, prevImage, K, R, t, tvec);
 
             //scale
-            scale = getAbsoluteScale(framenum ); 
+            //scale = getAbsoluteScale(framenum ); 
             //cout << "Scale is " << scale << endl;
 
-            if ( (!t.empty()) && (scale>0.1) &&(t.at<double>(2) > t.at<double>(0)) && (t.at<double>(2) > t.at<double>(1))) 
+            if ( (!t.empty() && features_count > 5) /*&& (scale>0.1) &&(t.at<double>(2) > t.at<double>(0)) && (t.at<double>(2) > t.at<double>(1))*/) 
             {
                 //cout << "scale*t :" << scale*t << endl;   
                  t_f = t_f + scale*(R_f*t);
